@@ -13,15 +13,19 @@ def receive_event():
     print("✅ Cloud Run received event:")
     print(json.dumps(event, indent=2))
 
+    # CloudEvent payload is inside 'data'
+    data = event.get("data", {})
+
     # Save minimal info for visualization
     event_record = {
-        "file_name": event.get("name"),
-        "bucket": event.get("bucket"),
+        "file_name": data.get("name"),
+        "bucket": data.get("bucket"),
         "time": datetime.datetime.utcnow().isoformat() + "Z"
     }
     received_events.append(event_record)
 
-    return {"status": "processed"}, 200
+    # Respond with 204 to acknowledge Eventarc
+    return "", 204
 
 @app.route("/events", methods=["GET"])
 def list_events():
